@@ -1,0 +1,19 @@
+<html>
+    <head>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.0/react.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.0/react-dom.min.js"></script>
+    </head>
+    <body>
+        <div id='divHelloWorld'></div>
+        <div id='divUl'></div>
+    </body>
+    <script type="text/javascript">
+        var helloReact = React.createElement('div', { 'data-id': 1}, 'hello world');
+        ReactDOM.render(helloReact, document.getElementById('divHelloWorld'));
+
+        var li1 = React.createElement('li', null, 'this is li 1');
+        var li2 = React.DOM.li(null, 'this is li 2');
+        var ul = React.createElement('ul', null, li1, li2);
+        ReactDOM.render(ul, document.getElementById('divUl'));
+    </script>
+</html>
