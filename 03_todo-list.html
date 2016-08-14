@@ -1,0 +1,148 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.0/react.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.0/react-dom.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+    </head>
+    <body>
+        <div id='todoList'></div>
+    </body>
+    <script type="text/babel">
+        var TodoFilter = React.createClass({
+            typeChange: function(event){
+                this.props.onTypeChange(event.target.value);
+            },
+            componentDidMount: function(){
+                ReactDOM.findDOMNode(this.refs.rdoAll).checked = true;
+            },
+            render: function(){
+                return (
+                    <div>
+                        <input ref='rdoAll' id='rdoAll' type='radio' name='filter' value='All' onChange={this.typeChange}/><label htmlFor='rdoAll'>全部</label>
+                        <input ref='rdoNotCompleted' id='rdoNotCompleted' type='radio' name='filter' value='NotCompleted' onChange={this.typeChange} /><label htmlFor='rdoNotCompleted'>未完成</label>
+                        <input ref='rdoCompleted' id='rdoCompleted' type='radio' name='filter' value='Completed' onChange={this.typeChange} /><label htmlFor='rdoCompleted'>已完成</label>                  
+                    </div>
+                );
+            }
+        });
+
+        var TodoList = React.createClass({
+            complete: function(event){
+                var id = event.target.getAttribute('data-id');
+                this.props.onComplete(id);
+            },
+            render: function(){
+                var list = [];
+                for(var index in this.props.list){
+                    var item = this.props.list[index];
+                    var typeElement = item.type == 'Completed' ? 
+                        <span style={{color: 'green'}}>[已完成]</span> 
+                        : 
+                        <span><span style={{color: 'red'}}>[未完成]</span><button data-id={item.id} onClick={this.complete}>标记为已完成</button></span>;
+                    list.push(<li key={item.id}>{item.title}{typeElement}</li>)
+                }
+                return (
+                    <ul>
+                        {list}
+                    </ul>
+                );
+            }
+        });
+
+        var TodoCreator = React.createClass({
+            getInitialState: function(){
+                return { title: '' }
+            },
+            titleChange: function(event){
+                this.setState({ title: event.target.value });
+            },
+            addTodo: function(){
+                this.props.onAddTodo(this.state.title);
+                this.setState({ title: '' });
+            },
+            render: function(){
+                return (
+                    <div>
+                        <input onChange={this.titleChange} value={this.state.title} />
+                        <button onClick={this.addTodo}>添加</button>
+                    </div>
+                );
+            }
+        });
+
+        var TodoContainer = React.createClass({
+            getInitialState: function(){
+                return { 
+                    type: 'All',
+                    list: [
+                        { id: 1, title: 'AAA', type: 'NotCompleted' },
+                        { id: 2, title: 'BBB', type: 'NotCompleted' },
+                        { id: 3, title: 'CCC', type: 'Completed' }
+                    ]
+                }
+            },
+            typeChange: function(type){
+                this.setState({
+                    type: type
+                });
+            },
+            addTodo: function(title){
+                var item = { id: this.state.list.length + 1, title: title, type: 'NotCompleted' }
+                var stateList = this.state.list;
+                stateList.push(item)
+                this.setState({
+                    list: stateList
+                });
+            },
+            complete: function(id){
+                var list= this.state.list;
+                for(var i in list){
+                    var item = list[i];
+                    if(item.id == id){
+                        item.type = 'Completed';
+                        break;
+                    }
+                }
+                this.setState({
+                    list: list
+                });
+            },
+            render: function(){
+                var type = this.state.type;
+                var todoList = [];
+                if(type === 'NotCompleted'){
+                    for(var i in this.state.list){
+                        var item = this.state.list[i];
+                        if(item.type === 'NotCompleted'){
+                            todoList.push(item);
+                        }
+                    }
+                }
+
+                if(type === 'Completed'){
+                    for(var i in this.state.list){
+                        var item = this.state.list[i];
+                        if(item.type === 'Completed'){
+                            todoList.push(item);
+                        }
+                    }
+                }
+
+                if(type === 'All'){
+                    var todoList = this.state.list;
+                }
+
+                return (
+                    <div>
+                        <TodoFilter type={this.state.type} onTypeChange={this.typeChange} />
+                        <TodoList list={todoList} onComplete={this.complete} />
+                        <TodoCreator onAddTodo={this.addTodo} />
+                    </div>
+                );
+            }
+        });
+
+        ReactDOM.render(<TodoContainer />, document.getElementById('todoList'));
+    </script>
+</html>
